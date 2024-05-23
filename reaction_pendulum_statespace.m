@@ -47,7 +47,7 @@ disp(rank(ctrb(A, B)));
 save reaction_pendulum.mat A B C D x_e
 
 %% Discretize the system
-Ts = 0.01;
+Ts = 0.05;
 
 G = ss(A,B,C,D);
 

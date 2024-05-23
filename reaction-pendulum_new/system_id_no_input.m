@@ -29,7 +29,7 @@ data = iddata(y, input, Ts);
  
 p1 = 10.85;
 p2 = 0.5;
-theta0 = [0.6; 0.17; 0.2];
+theta0 = [0.6; 0.12; 0.01];
 
 % Create the grey-box model
 sys = idgrey(@pendulum_model, theta0, 'c');
