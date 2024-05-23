@@ -70,9 +70,9 @@ parameters = {'m_tot', a; 'J_th',b; 'J_phi',c; 'k',d; 'th_0', e};
 % parameters = [a b c d e];
 %  [A,B,C,x0] = pendulum(parameters)
 fcn_type = 'c';
-m = idgrey(fun, parameters,fcn_type);
+m = idgrey(fun, parameters, fcn_type);
 
-No_input_data = load('no_input.mat')
+No_input_data = load('/Users/mavi.ciabba/Desktop/VALE/Q4/Integration project/GIT_HUB/reaction-pendulum_new/no_input.mat');
 y = [No_input_data.theta.Data No_input_data.phi_dot.Data];
 u = No_input_data.i_m.Data;
 data = iddata(y,u,0.05);
