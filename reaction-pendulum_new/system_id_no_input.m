@@ -5,12 +5,12 @@ clc
 % Load the data
 % load('no_sin_01amp.mat')
 % load('no_input_02amp.mat')
-load('no_input.mat')
+load('no_input_fr.mat')
 % input = u.Data(65:220);
 % y = [theta.Data(65:220)]; 
 
-input = u.Data(250:470);
-y = [theta.Data(250:470)]; 
+input = u.Data(100:(30/0.05));
+y = [theta.Data(100:(30/0.05))]; 
 
 
 % Define constants
@@ -27,15 +27,15 @@ nx = 10; % Choose a number larger than the expected model order
 % Prepare the iddata object with no input
 data = iddata(y, input, Ts);
  
-p1 = 10.85;
-p2 = 0.5;
-theta0 = [0.6; 0.12; 0.01];
+
+a_1 = -9.81/0.6;
+a_2 = -0.012;
 
 % Create the grey-box model
-sys = idgrey(@pendulum_model, theta0, 'c');
+sys = idgrey(@pendulum_model, {a_1, a_2}, 'c');
 
 % Set parameter constraints
-sys.Structure.Parameters(1).Minimum = 0;
+% sys.Structure.Parameters(1).Minimum = 0;
 
 % Set options for greyest to estimate initial state
 opt = greyestOptions('InitialState', 'estimate', 'Display', 'on');
@@ -52,14 +52,14 @@ disp(estimatedParams);
 compare(data, estimatedModel);
 
 
-function [A, B, C, D] = pendulum_model(theta, Ts)
+function [A, B, C, D] = pendulum_model(a_1,a_2, Ts)
     % g = theta(1);
-    g = 9.81;
-    l = theta(1);
-    m = theta(2);
-    b = theta(3);
+    % g = 9.81;
+    % l = theta(1);
+    % m = theta(2);
+    % b = theta(3);
     
-    A = [0 1; -g/l -b/(m*l^2)];
+    A = [0 1; a_1 a_2];
     B = [0; 0]; 
     C = [1 0]; 
     D = [0]; 
