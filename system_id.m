@@ -2,16 +2,13 @@ close all
 clear all
 clc
 load('chirp_new.mat')
-x = 1;
+x = 200;
 % y = 100/0.05-1;
-x1 = 200;
-y1 = 450;
+x1 = 400;
 % load('no_chirp_015amp.mat')
-load('square.mat')
-load('no_sin_01amp.mat')
 load('no_chirp_02amp.mat')
-input2 = u.Data(200:end);
-y2 = [theta.Data(200:end) phi_dot.Data(200:end)]; 
+input2 = u.Data(x1:end);
+y2 = [theta.Data(x1:end) phi_dot.Data(x1:end)]; 
 data2 = iddata(y2, input2, 0.05);
 % load('no_sin_01amp.mat')
 % load('no_chirp_015amp.mat')
