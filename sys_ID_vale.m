@@ -61,12 +61,28 @@ function [A, B, C, D] = reaction_wheel_pendulum(theta, Ts)
     b_theta = theta(3);
     b_phi = theta(4);
 
-    A = [0 1 0 0; 
-        -mgl/J_theta -b_theta/J_theta 0 b_phi/J_theta; 
-        0 0 0 1;
-        mgl/J_theta b_theta/J_theta 0 -b_phi/J_theta];
+    A = [-b_theta/J_theta, mgl/J_theta, b_phi/J_theta,                   0;
+        1,                0,           0,                               0;
+        b_theta/J_theta,   -mgl/J_theta -b_phi*((1/J_theta)+(1/J_phi)),  0;
+        0,                0,            0,                              1;
+    ];
 
-    B = [0; -k/J_theta; 0; (k/J_theta + k/J_phi)];
-    C = [1 0 0 0; 0 0 0 1];
+%     A = [0 1 0 0; 
+%         -mgl/J_theta -b_theta/J_theta 0 b_phi/J_theta; 
+%         0 0 0 1;
+%         mgl/J_theta b_theta/J_theta 0 -b_phi/J_theta];
+
+    B = [-k/J_theta; 0; (k/J_theta + k/J_phi); 0];
+    % B = zeros(4,1);
+%     B = [0; -k/J_theta; 0; (k/J_theta + k/J_phi)]
+    C = [0 0 1 0; 0 0 1 0];
     D = [0;0];
+%     A = [0 1 0 0; 
+%         -mgl/J_theta -b_theta/J_theta 0 b_phi/J_theta; 
+%         0 0 0 1;
+%         mgl/J_theta b_theta/J_theta 0 -b_phi/J_theta];
+% 
+%     B = [0; -k/J_theta; 0; (k/J_theta + k/J_phi)];
+%     C = [1 0 0 0; 0 0 0 1];
+%     D = [0;0];
 end
