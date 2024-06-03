@@ -13,8 +13,8 @@ G_cont = ss(A,B,C,D);
 
 poles_cont = pole(G_cont);
 
-q1 = 1;
-q2 = 10; 
+q1 = 100;
+q2 = 100; 
 q3 = 100;
 
 Q =[q1 0 0;
@@ -48,7 +48,7 @@ sysObserver = ss(Phi_obsv, Gamma_obsv, C_obsv,[], Ts);
 
 t = 0:Ts:5;
 u = zeros(size(t));
-y = lsim(sysObserver, u, t, [0.1 0.02 0.0 0.1 0.1 0.1]');
+y = lsim(sysObserver, u, t, [0.001 0.0 0.0 0.0 0.0 0.0]');
 
 figure(1)
 stairs(t, y(:,1))
