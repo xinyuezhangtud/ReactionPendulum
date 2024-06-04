@@ -1,7 +1,7 @@
 clear all
 close all
 clc
-
+%%
 % INSPIRATION TAKEN FROM MPC CODE 
 a21 =  -10.4142;
 a22 = -0.1793;
@@ -31,14 +31,11 @@ LTI.D = sys_DT.D;
 
 v = [10^5 10^4 10^2];
 weight.Q = diag(v);   % weight on output
-weight.R = 5;
+weight.R = 10;
 [P, K, eigvals] = dare(LTI.A, LTI.B, weight.Q, weight.R, [], []);
 weight.P = P;
 
-% model = LTISystem(sys_DT);
-% model.x.penalty = QuadFunction(weight.Q);
-% model.u.penalty = QuadFunction(weight.R);
-% Tset = model.LQRSet;
+% R = 10, N = 40 works, otherise terminal ste is a bit not converged
 
 % Simulation horizon and input constraints
 T_sim = 500;
