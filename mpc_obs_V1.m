@@ -3,19 +3,19 @@ close all
 clc
 %%
 % INSPIRATION TAKEN FROM MPC CODE 
-a21 =  -10.4142;
-a22 = -0.1793;
-a24 = -0.0030;
-a41 = 10.4142;
-a42 = 0.1793;
-a44 = -0.9433;
-b2 = -3.0445;
-b4 = 343.9576;
+a21 = -9.9834;
+a22 = -9.9834;
+a24 = 0.0108;
+a41 = 11.4724;
+a42 = -0.0378;
+a44 = -0.9255;
+b2  = -3.0625;
+b4  = 348.4161;
 Ts = 0.05;
 
 A = [0 1 0; 
-     a21 a22 a24; 
-     a41 a42 a44];
+     -a21 a22 a24; 
+     -a41 a42 a44];
 B = [0; b2; b4];
 C = [1 0 0; 0 0 1];
 D = [0;0];
@@ -29,7 +29,7 @@ LTI.B = sys_DT.B;
 LTI.C = sys_DT.C;
 LTI.D = sys_DT.D;
 
-v = [10^5 10^4 10^2];
+v = [10^2 10^2 10^2];
 weight.Q = diag(v);   % weight on output
 weight.R = 10;
 [P, K, eigvals] = dare(LTI.A, LTI.B, weight.Q, weight.R, [], []);
@@ -55,10 +55,10 @@ H = S' * Q_bar * S + kron(eye(dim.N),weight.R);
 h = S' * Q_bar * T;
 
 % MPC formulation
-x = zeros(dim.nx,T_sim+1);
+xehat = zeros(dim.nx,T_sim+1);
 u_rec = zeros(dim.nu,T_sim);
 LTI.x0=[0.1; 0; 0];
-x(:,1) = LTI.x0;
+xehat(:,1) = LTI.x0;
 
 % Inequality Constraints
 x1_constraint = 0.3; % it is about 17 degrees
@@ -79,7 +79,30 @@ A_in = F*S;
 % Equality constraints (terminal)
 Ae = S(end-dim.nx+1:end,:);
 be = T(end-dim.nx+1:end,:);
+%% Observer
+sys_obs = ss(LTI.A, LTI.B, LTI.C, [], Ts);
+pol = pole(sys_obs);
+pol_CT = pole(sys_CT);
 
+poles_CT_fast = 10*pol_CT;
+
+p1_obsv = exp(poles_CT_fast(1)*Ts);
+p2_obsv = exp(-poles_CT_fast(2)*Ts);
+p3_obsv = exp(poles_CT_fast(3)*Ts);
+p_obsv = [p1_obsv,p2_obsv,p3_obsv]';
+L = place(LTI.A', LTI.C', p_obsv)';
+
+e = LTI.A - L*LTI.C
+
+cl_sys = ss(LTI.A-L*LTI.C, LTI.B,LTI.C,[],Ts);
+t = 0:Ts:10;
+u = zeros(size(t));
+
+[yObs, tOut, xObs] = lsim(cl_sys, u, t, [0.05 0.0 0.0]');
+figure(29)
+stairs(t,yObs)
+
+%%
 
 % Compute terminal set using MPT3
 model = LTISystem(sys_DT);
@@ -95,8 +118,7 @@ model.x.with('terminalSet');
 model.x.terminalSet = Tset;
 model.x.with('terminalPenalty');
 model.x.terminalPenalty = PN;
-% dim.N = 50;
-ctrl = MPCController(model, dim.N)
+ctrl = MPCController(model, dim.N);
 x0 = [0.1; 0; 0];
 Nsim = 500;
 loop = ClosedLoop(ctrl, model);
@@ -116,7 +138,7 @@ o = waitbar(0, 'Progress');
 
 for k = 1 : T_sim
     Constraint = [];
-    x_0 = x(:,k); 
+    x_0 = xehat(:,k); 
     u_horizon = sdpvar(dim.nu*dim.N,1);  % [5,1] where 5 is horizon, 1, input dim          
     
     % Contraints
@@ -138,7 +160,9 @@ for k = 1 : T_sim
         % Select the first input only
         u_rec(k)=u_horizon(1);
         % Compute the state/output evolution
-        x(:,k+1)=LTI.A*x_0 + LTI.B*u_rec(k);        
+%         x(:,k+1)=LTI.A*x_0 + LTI.B*u_rec(k);        
+        y(:,k) = LTI.C * xehat(:,k);
+        xehat(:,k+1) = LTI.A * xehat(:,k) + LTI.B * u_rec(k) + L * (y(:,k) - LTI.C *  xehat(:,k));
 
         clear u_horizon
     else
@@ -151,14 +175,22 @@ end
 close(o);
 
 %% Plots
+figure(199)
+stairs(y(1,:),'o')
+hold on
+stairs(y(2,:),'o')
 
-% MPC
+stairs(xehat(1,:))
+stairs(xehat(2,:))
+legend('y_1','y_2', ' x_1', ' x_2');
+
+%% MPC
 time = (0:k) * 0.05;
 figure(10)
-stairs(time, x(1,:)),
+stairs(time, xehat(1,:)),
 hold on
-stairs(time,x(2,:)),
-stairs(time, x(3,:)),
+stairs(time,xehat(2,:)),
+stairs(time, xehat(3,:)),
 xlabel('Time t [s]'), 
 ylabel('States x MPC'), 
 grid on;
