@@ -12,33 +12,52 @@ G_cont = ss(A,B,C,D);
 % poles_disc = pole(G_disc);
 
 poles_cont = pole(G_cont);
-
-q1 = 1e1;
-q2 = 1e1; 
-q3 = 1e-4;
-% q1 = 4.5;
-% q2 = 3.2;
-% q3 = 0.000031;
-
+%% downward equilibrium
+% q1 = 1e2;
+% q2 = 1e2; 
+% q3 = 1e-4;
+% 
+% Q =[q1 0 0;
+%     0 q2 0;
+%     0 0 q3];
+% R = 1e2;
+%% upwards
+q1 = 1e5;
+q2 = 1e2; 
+q3 = 1e-3;
 Q =[q1 0 0;
     0 q2 0;
     0 0 q3];
-R = 1e2;
-% R=100;
+R = 1e0;
+%%
+
 K_lqr = dlqr(Phi,Gamma, Q,R);
 disp(K_lqr);
-poles_cont_5 = 8*poles_cont;
+poles_cont_5 = 5*poles_cont;
 poles_disc = pole(G_disc);
 
-p1_obsv = exp(-poles_cont_5(1)*Ts);
+p1_obsv = exp(poles_cont_5(1)*Ts);
 p2_obsv = exp(poles_cont_5(2)*Ts);
 p3_obsv = exp(poles_cont_5(3)*Ts);
 
 p_obsv = [p1_obsv, p2_obsv, p3_obsv]';
 
 % L = place(Phi', C', p_obsv)';
-p_obsv_disc = eig(Phi - Gamma*K_lqr)*0.5;
-L = place(Phi', C', p_obsv_disc)';
+p_obsv_disc = eig(Phi - Gamma*K_lqr)*0.9;
+sys_cl = ss(Phi-Gamma*K_lqr, Gamma, G_disc.C, G_disc.D, Ts);
+sys_cl_cont= d2c(sys_cl, 'zoh');
+poles_cl_cont= pole(sys_cl_cont);
+
+poles_cl_cont_5 = 3*poles_cl_cont;
+
+
+p1_obsv_dc = exp(poles_cl_cont_5(1)*Ts);
+p2_obsv_dc = exp(poles_cl_cont_5(2)*Ts);
+p3_obsv_dc = exp(poles_cl_cont_5(3)*Ts);
+
+p_obsv_dc = [p1_obsv_dc;p2_obsv_dc;p3_obsv_dc];
+
+L = place(Phi', C', p_obsv_dc)';
 % 
 Phi_obsv = [Phi - Gamma*K_lqr Gamma*K_lqr;
             zeros(3,3) Phi-L*C];
