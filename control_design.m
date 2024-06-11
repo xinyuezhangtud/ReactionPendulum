@@ -4,7 +4,7 @@ clc
 
 load('reaction_pendulum.mat')
 %% LQR
-
+h=0.05;
 Ts = 0.05;
 G_disc = ss(Phi, Gamma, C, D, Ts);
 G_cont = ss(A,B,C,D);
@@ -25,14 +25,14 @@ K_lqr = dlqr(Phi,Gamma, Q,R);
 
 poles_cont_5 = 5*poles_cont;
 
-p1_obsv = exp(poles_cont_5(1)*Ts);
-p2_obsv = exp(-poles_cont_5(2)*Ts);
+p1_obsv = exp(-poles_cont_5(1)*Ts);
+p2_obsv = exp(poles_cont_5(2)*Ts);
 p3_obsv = exp(poles_cont_5(3)*Ts);
 
 p_obsv = [p1_obsv, p2_obsv, p3_obsv]';
 
 L = place(Phi', C', p_obsv)';
-eig(Phi - L*C)
+eig(Phi - L*C);
 % 
 Phi_obsv = [Phi - Gamma*K_lqr Gamma*K_lqr;
             zeros(3,3) Phi-L*C];
