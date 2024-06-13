@@ -23,32 +23,44 @@ poles_cont = pole(G_cont);
 % R = 1e2;
 %% upwards
 q1 = 1e5;
-q2 = 1e2; 
-q3 = 1e-3;
+q2 = 1e3; 
+q3 = 1e-6;
 Q =[q1 0 0;
     0 q2 0;
     0 0 q3];
-R = 1e0;
-%%
+R = 1e1;
+
+%% upwards
+q1 =4.5;
+q2 = 3.50; 
+q3 = 0.0071;
+Q =[q1 0 0;
+    0 q2 0;
+    0 0 q3];
+R = 25;
+%% 
 
 K_lqr = dlqr(Phi,Gamma, Q,R);
 disp(K_lqr);
-poles_cont_5 = 5*poles_cont;
+poles_cont_5 = 10*poles_cont;
 poles_disc = pole(G_disc);
 
-p1_obsv = exp(poles_cont_5(1)*Ts);
+p1_obsv = exp(-poles_cont_5(1)*Ts);
 p2_obsv = exp(poles_cont_5(2)*Ts);
 p3_obsv = exp(poles_cont_5(3)*Ts);
 
 p_obsv = [p1_obsv, p2_obsv, p3_obsv]';
 
 % L = place(Phi', C', p_obsv)';
-p_obsv_disc = eig(Phi - Gamma*K_lqr)*0.9;
+
+p_obsv_disc = eig(Phi - Gamma*K_lqr)*1;
 sys_cl = ss(Phi-Gamma*K_lqr, Gamma, G_disc.C, G_disc.D, Ts);
 sys_cl_cont= d2c(sys_cl, 'zoh');
+
+
 poles_cl_cont= pole(sys_cl_cont);
 
-poles_cl_cont_5 = 3*poles_cl_cont;
+poles_cl_cont_5 = 15*poles_cl_cont;
 
 
 p1_obsv_dc = exp(poles_cl_cont_5(1)*Ts);
@@ -66,7 +78,6 @@ Phi_obsv = [Phi - Gamma*K_lqr Gamma*K_lqr;
 Gamma_obsv = [Gamma;
     zeros(size(Gamma))];
 
-C_obsv = [1 0 0; 0 0 1];
 C_obsv = eye(6);
 
 sysObserver = ss(Phi_obsv, Gamma_obsv, C_obsv,[], Ts);
@@ -74,17 +85,17 @@ sys_cl = ss(Phi-Gamma*K_lqr, Gamma, G_disc.C, G_disc.D, Ts);
 t = 0:Ts:50;
 u = zeros(size(t));
 y = lsim(sysObserver, u, t, [0.1 0.02 0.0 0.1 0.1 0.1]');
-y = lsim(sys_cl, u, t, [0.01 0 0]');
+% y = lsim(sys_cl, u, t, [0.01 0 0]');
 figure(1)
 stairs(t, y(:,1))
 hold on
 stairs(t, y(:,2))
-% stairs(t, y(:,3))
+stairs(t, y(:,3))
 title('states')
 legend('theta', 'phi dot')
-% figure(2)
-% stairs(t, y(:,4))
-% hold on
-% stairs(t, y(:,5))
-% stairs(t, y(:,6))
-% title('e')
+figure(2)
+stairs(t, y(:,4))
+hold on
+stairs(t, y(:,5))
+stairs(t, y(:,6))
+title('e')

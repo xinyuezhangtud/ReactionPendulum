@@ -50,7 +50,7 @@ b2 = -k/J_th;
 b4 = k/J_th + k/J_phi;
 
 a21=  -10.4142;
-a22= -0.1793;
+a22= 0.1793;
 a24= -0.0030;
 a41=10.4142;
 a42 =0.1793;
@@ -58,7 +58,7 @@ a44= -0.9433;
 b2 = -3.0445;
 b4 = 343.9576;
 
-sys= idgrey(@reaction_wheel_pendulum, {a21,a22,a24,a42,a44,b2,b4}, 'c');
+sys= idgrey(@reaction_wheel_pendulum, {a21,a22,a24,a44,b2,b4}, 'c');
 % sys.Structure.Parameters(1).Minimum = 0;
 
 sys.Structure.Parameters(1).Free= true;
@@ -82,7 +82,7 @@ compare(data2,estimatedModel);
 [~, fit1, ~] = compare(data, estimatedModel);
 %% 
 
-function [A, B, C, D] = reaction_wheel_pendulum(a21,a22,a24,a42,a44,b2,b4,Ts)
+function [A, B, C, D] = reaction_wheel_pendulum(a21,a22,a24,a44,b2,b4,Ts)
     % mgl = theta(1);
     % J_theta = theta(2);
     % b_theta = theta(3);
@@ -92,8 +92,8 @@ function [A, B, C, D] = reaction_wheel_pendulum(a21,a22,a24,a42,a44,b2,b4,Ts)
 
 
     A = [0 1 0; 
-        a21 a22 a24; 
-        -a21 a42 a44];
+        a21 -a22 a24; 
+        -a21 a22 a44];
     B = [0; b2; b4];
     % B = zeros(4,1);
     C = [1 0 0; 0 0 1];
