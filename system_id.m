@@ -66,7 +66,7 @@ sys.Structure.Parameters(2).Free= true;
 sys.Structure.Parameters(4).Free= true;
 sys.Structure.Parameters(5).Free= true;
 
-opt = greyestOptions('InitialState','estimate','Display','on');
+opt = greyestOptions('InitialState','estimate','Display','on', 'EnforceStability', 'TRUE');
 estimatedModel = greyest(data, sys, opt);
 
 estimatedParams = getpvec(estimatedModel);
