@@ -13,14 +13,14 @@ G_cont = ss(A,B,C,D);
 
 poles_cont = pole(G_cont);
 
-q1 = 100;
-q2 = 100; 
-q3 = 100;
+q1 = 1;
+q2 = 1; 
+q3 = 1;
 
 Q =[q1 0 0;
     0 q2 0;
     0 0 q3];
-R = 10000;
+R = 10;
 K_lqr = dlqr(Phi,Gamma, Q,R);
 
 poles_cont_5 = 10*poles_cont;
@@ -59,17 +59,17 @@ cl_sys_2 = ss(Phi-L_2*C, Gamma,C_obsv,[],Ts);
 cl_sys = ss(Phi-L*C, Gamma,C_obsv,[],Ts);
 
 
-%%
-t = 0:Ts:5;
-u = zeros(size(t));
-[yObs, tOut, xObs] = lsim(cl_sys, u, t, [0.1 0.0 0.0]');
-% [y, tOut, x] = lsim(G_disc, u, t, [0.1 0.0 0.0]');
-[y2, tOut, x2] = lsim(cl_sys_2, u, t, [0.1 0.0 0.0]');
-figure(10)
-stairs(y2)
-hold on
-stairs(yObs)
-legend('y2_1','y2_2','y_1','y_2')
+% %%
+% t = 0:Ts:5;
+% u = zeros(size(t));
+% [yObs, tOut, xObs] = lsim(cl_sys, u, t, [0.1 0.0 0.0]');
+% % [y, tOut, x] = lsim(G_disc, u, t, [0.1 0.0 0.0]');
+% [y2, tOut, x2] = lsim(cl_sys_2, u, t, [0.1 0.0 0.0]');
+% figure(10)
+% stairs(y2)
+% hold on
+% stairs(yObs)
+% legend('y2_1','y2_2','y_1','y_2')
 % 
 % figure(1)
 % stairs(t, xObs(:,1))
